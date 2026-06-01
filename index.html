@@ -2,6 +2,13 @@
 <html lang="en">
 
 <head>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "56fa91a9242d4e2ea700d269bec80953"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -95,13 +102,88 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        if (firstNum === "" || secondNum === "")
+          throw new ValidationError("Missing argument");
+        if (operator === "/" && secondNum === "0")
+          throw new ValidationError("Attempting to divide by 0");
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch (error) {
+        if (error instanceof ValidationError) {
+          console.error("Invalid Data:", error.message);
+        } else if (error instanceof SyntaxError) {
+          console.error("Syntax Error:", error.message);
+        } else {
+          throw error;
+        }
+      } finally {
+        console.log("Operation Complete");
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+
+    class ValidationError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "ValidationError";
+      }
+    }
+    
+    function deepest() { console.trace(); }
+    
+    function deeper() { deepest(); }
+
+    function deep() { deeper(); }
+
+    function handleBtnClick(event) {
+      const text = event.target.innerText;
+      if (text === "Console Log") {
+        console.log("Console Log Demo");
+      } else if (text === "Console Error") {
+        console.error("Console Error Demo");
+      } else if (text === "Console Count") {
+        console.count("Count Button");
+      } else if (text === "Console Warn") {
+        console.warn("Console Warn Button");
+      } else if (text === "Console Assert") {
+        const number = 2;
+        console.assert(number === 3, {number, errorMsg: "The number does not equal 3"});
+      } else if (text === "Console Clear") {
+        console.clear();
+      } else if (text === "Console Dir") {
+        console.dir(event.target);
+      } else if (text === "Console dirxml") {
+        console.dirxml(event.target);
+      } else if (text === "Console Group Start") {
+        console.group();
+      } else if (text === "Console Group End") {
+        console.groupEnd();
+      } else if (text === "Console Table") {
+        console.table([
+          {name: "Software Engineering", num: 110},
+          {name: "Programming Languages: Principles and Paradigms", num: 130},
+          {name: "Advanced Software Engineering", num: 112}
+        ])
+      } else if (text === "Start Timer") {
+        console.time("Timer Button");
+      } else if (text === "End Timer") {
+        console.timeEnd("Timer Button");
+      } else if (text === "Console Trace") {
+        deep();
+      } else if (text === "Trigger a Global Error") {
+        boom();
+      }
+    }
+
+    errorBtns.forEach(button => button.addEventListener("click", handleBtnClick));
+
+    window.onerror = function() {
+      console.log("Sadly an error happened my friend");
+    }
   </script>
 </body>
 
